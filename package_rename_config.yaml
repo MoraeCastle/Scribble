@@ -1,0 +1,31 @@
+package_rename_config:
+  android:
+    app_name: 끄적끄적
+    package_name: com.sandcastle.scribble
+    override_old_package: com.example.scribble
+    lang: java
+
+  ios:
+    app_name: 끄적끄적
+    bundle_name: 끄적끄적
+    package_name: com.sandcastle.travel
+
+  linux:
+    app_name: 끄적끄적
+    package_name: com.sandcastle.travel
+    exe_name:
+
+  macos:
+    app_name: 끄적끄적
+    package_name: com.sandcastle.travel
+    copyright_notice:
+
+  web:
+    app_name: 끄적끄적
+    description:
+
+  windows:
+    app_name: 끄적끄적
+    organization:
+    copyright_notice:
+    exe_name:
