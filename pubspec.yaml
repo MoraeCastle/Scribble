@@ -16,6 +16,7 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   keyboard_service: ^2.0.2
   url_launcher: ^6.2.5
+  quill_html_editor: ^2.2.8
 
 dev_dependencies:
   flutter_test:
