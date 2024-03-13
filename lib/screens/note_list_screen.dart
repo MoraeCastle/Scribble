@@ -6,6 +6,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:keyboard_service/keyboard_service.dart';
+import 'package:scribble/service/routing_service.dart';
 
 /// 메인 씬
 class NoteListView extends StatefulWidget {
@@ -45,7 +46,7 @@ class _NoteListViewState extends State<NoteListView> {
                         children: [
                           IconButton(
                             onPressed: () {
-
+                              Navigator.pushNamed(context, NoteEditRoute);
                             },
                             style: IconButton.styleFrom(
                               elevation: 5,
@@ -78,7 +79,7 @@ class _NoteListViewState extends State<NoteListView> {
                           Flexible(
                             child: IconButton(
                               onPressed: () {
-
+                                Navigator.pushNamed(context, SettingRoute);
                               },
                               style: IconButton.styleFrom(
                                 elevation: 5,
