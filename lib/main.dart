@@ -13,6 +13,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    route = NoteListRoute;
+
     return MaterialApp(
       title: '끄적끄적',
       theme: ThemeData(
