@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
@@ -6,7 +7,9 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:keyboard_service/keyboard_service.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:quill_html_editor/quill_html_editor.dart';
+import 'package:scribble/utils/system_util.dart';
 
 /// 메인 씬
 class NoteEditView extends StatefulWidget {
@@ -123,9 +126,7 @@ class _NoteListViewState extends State<NoteEditView> {
                       ),
                       SizedBox(width: 5),
                       IconButton(
-                        onPressed: () {
-
-                        },
+                        onPressed: () => _saveData(),
                         style: IconButton.styleFrom(
                           elevation: 5,
                           backgroundColor: Colors.white,
@@ -251,9 +252,9 @@ class _NoteListViewState extends State<NoteEditView> {
     );
   }
 
-  void getHtmlText() async {
+  Future<String> getHtmlText() async {
     String? htmlText = await controller.getText();
-    debugPrint(htmlText);
+    return htmlText;
   }
   void setHtmlText(String text) async {
     await controller.setText(text);
@@ -272,4 +273,28 @@ class _NoteListViewState extends State<NoteEditView> {
   void clearEditor() => controller.clear();
   void enableEditor(bool enable) => controller.enableEditor(enable);
   void unFocusEditor() => controller.unFocus();
+
+  Future<File> _getLocalFile() async {
+    final directory = await getApplicationDocumentsDirectory();
+    return File('${directory.path}/document.txt');
+  }
+
+  Future<void> _saveData() async {
+    String path = await SystemUtil.getDataPath();
+    File file = File(path + "/temp222.md");
+
+    // final file = await _getLocalFile();
+    String htmlText = await getHtmlText();
+    await file.writeAsString(htmlText);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Document saved')));
+  }
+
+  Future<String?> _readData() async {
+    try {
+      final file = await _getLocalFile();
+      return await file.readAsString();
+    } catch (e) {
+      return null;
+    }
+  }
 }

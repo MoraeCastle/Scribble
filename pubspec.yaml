@@ -17,6 +17,10 @@ dependencies:
   keyboard_service: ^2.0.2
   url_launcher: ^6.2.5
   quill_html_editor: ^2.2.8
+  path_provider: ^2.1.2
+  shared_preferences: ^2.2.2
+  permission_handler: ^11.3.0
+  fluttertoast: ^8.2.4
 
 dev_dependencies:
   flutter_test:
