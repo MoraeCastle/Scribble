@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    route = NoteListRoute;
+    // route = NoteListRoute;
 
     return MaterialApp(
       title: '끄적끄적',

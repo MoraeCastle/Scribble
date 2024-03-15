@@ -1,12 +1,9 @@
-import 'dart:ui';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:keyboard_service/keyboard_service.dart';
+import 'package:scribble/models/Memo.dart';
+import 'package:scribble/providers/data_provider.dart';
 import 'package:scribble/service/routing_service.dart';
+import 'package:provider/provider.dart';
 
 /// 메인 씬
 class NoteListView extends StatefulWidget {
@@ -18,68 +15,88 @@ class NoteListView extends StatefulWidget {
 
 class _NoteListViewState extends State<NoteListView> {
   bool isDeleteMode = false;
+  List<Memo>? currentMemoList;
+
+  @override
+  void initState() {
+    super.initState();
+    debugPrint('>>> NoteListView: initState');
+
+    currentMemoList = context.read<DataClass>().memoList;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    debugPrint('>>> NoteListView: dispose');
+  }
+
+  /// 리스트 최신화.
+  refreshMemoList() {
+    debugPrint('>>> NoteListView: refreshMemoList...');
+
+    if (mounted) {
+      setState(() {
+        currentMemoList = context.read<DataClass>().memoList;
+      });
+    }
+  }
+
+  List<Widget> setMemoList(List<Memo> dataList) {
+    List<Widget> resultList = [];
+
+    for (Memo item in dataList) {
+      resultList.add(
+          MemoItem(
+            action: () {
+
+            },
+            longAction: () {
+              if (!isDeleteMode) {
+                setState(() {
+                  isDeleteMode = true;
+                });
+              }
+            },
+            isSelectMode: isDeleteMode,
+          )
+      );
+    }
+
+    return resultList;
+  }
 
   @override
   Widget build(BuildContext context) {
     return KeyboardAutoDismiss(
       scaffold: Scaffold(
-        body: SafeArea(
-          child: Column(
-            children: [
-              // 탑 바
-              Container(
-                  width: double.infinity,
-                  margin: EdgeInsets.all(15),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      const Text(
-                        '메모 목록',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              Navigator.pushNamed(context, NoteEditRoute);
-                            },
-                            style: IconButton.styleFrom(
-                              elevation: 5,
-                              backgroundColor: Colors.white,
-                              foregroundColor: Colors.grey,
-                              surfaceTintColor: Colors.white,
-                              shadowColor: Colors.black,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                side: BorderSide(color: Colors.black, width: 1),
-                              ),
-                            ),
-                            icon: const Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Icon(
-                                  Icons.add,
-                                  color: Colors.black,
-                                ),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  '새 메모',
-                                  style: TextStyle(fontSize: 15, color: Colors.black),
-                                )
-                              ],
-                            ),
+          body: SafeArea(
+            child: Column(
+              children: [
+                // 탑 바
+                Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.all(15),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        const Text(
+                          '메모 목록',
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold
                           ),
-                          Flexible(
-                            child: IconButton(
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton(
                               onPressed: () {
-                                Navigator.pushNamed(context, SettingRoute);
+                                Navigator.pushNamed(context, NoteEditRoute).then((value) {
+                                  refreshMemoList();
+                                });
                               },
                               style: IconButton.styleFrom(
                                 elevation: 5,
@@ -89,81 +106,159 @@ class _NoteListViewState extends State<NoteListView> {
                                 shadowColor: Colors.black,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
-                                  side: BorderSide(color: Colors.black, width: 1),
+                                  side: const BorderSide(color: Colors.black, width: 1),
                                 ),
                               ),
-                              icon: const Icon(
-                                Icons.settings_outlined,
-                                color: Colors.black,
+                              icon: const Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Icon(
+                                    Icons.add,
+                                    color: Colors.black,
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    '새 메모',
+                                    style: TextStyle(fontSize: 15, color: Colors.black),
+                                  )
+                                ],
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  )
-              ),
-              // 리스트
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.only(
-                      left: 15, right: 15, bottom: 15
-                  ),
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: Colors.black,
-                      width: 1,
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      isDeleteMode ? deleteBar() : normalBar(),
-                      Expanded(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 10),
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                MemoItem(
-                                  action: () {
-
-                                  },
-                                  longAction: () {
-                                    if (!isDeleteMode) {
-                                      setState(() {
-                                        isDeleteMode = true;
-                                      });
-                                    }
-                                  },
-                                  isSelectMode: isDeleteMode,
+                            Flexible(
+                              child: IconButton(
+                                onPressed: () {
+                                  Navigator.pushNamed(context, SettingRoute);
+                                },
+                                style: IconButton.styleFrom(
+                                  elevation: 5,
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Colors.grey,
+                                  surfaceTintColor: Colors.white,
+                                  shadowColor: Colors.black,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    side: const BorderSide(color: Colors.black, width: 1),
+                                  ),
                                 ),
-                              ],
+                                icon: const Icon(
+                                  Icons.settings_outlined,
+                                  color: Colors.black,
+                                ),
+                              ),
                             ),
+                          ],
+                        ),
+                      ],
+                    )
+                ),
+                // 리스트
+                Expanded(
+                    child: Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(
+                            left: 15, right: 15, bottom: 15
+                        ),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: Colors.black,
+                            width: 1,
                           ),
                         ),
-                      ),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '조회된 메모가 없습니다.',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.grey
+                        child: Stack(
+                          children: [
+                            context.watch<DataClass>().memoList.isNotEmpty ?
+                            noteList(
+                              context.watch<DataClass>().memoList
+                            ) : emptyList(),
+                            Positioned.fill(
+                              child: Visibility(
+                                visible: currentMemoList != context.watch<DataClass>().memoList,
+                                child: Container(
+                                  color: Colors.white,
+                                  child: const Center(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.black,
+                                      strokeWidth: 3,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
-                      )
-                    ],
-                  )
-                )
+                          ],
+                        )
+                    )
+                ),
+              ],
+            ),
+          )
+      ),
+    );
+  }
+
+  Widget noteList(List<Memo> dataList) {
+    return Positioned.fill(
+      child: Column(
+        children: [
+          isDeleteMode ? deleteBar() : normalBar(),
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.only(top: 10),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: setMemoList(dataList),
+                ),
+              ),
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '$dataList.length 개의 메모 조회됨',
+                style: const TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey
+                ),
               ),
             ],
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget emptyList() {
+    return const Positioned.fill(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.folder_off_outlined,
+            size: 50,
+            color: Colors.grey,
           ),
-        )
+          SizedBox(height: 15),
+          Text(
+            '아직 메모가 없습니다.',
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey,
+              fontWeight: FontWeight.bold
+            ),
+          ),
+          Text(
+            '새 메모를 작성해보세요.',
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey,
+              fontWeight: FontWeight.bold
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -184,7 +279,7 @@ class _NoteListViewState extends State<NoteListView> {
               shadowColor: Colors.black,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(13),
-                side: BorderSide(color: Colors.black, width: 1),
+                side: const BorderSide(color: Colors.black, width: 1),
               ),
             ),
             icon: const Row(
@@ -205,14 +300,14 @@ class _NoteListViewState extends State<NoteListView> {
             ),
           ),
         ),
-        SizedBox(
+        const SizedBox(
           width: 10,
         ),
         Flexible(
           flex: 9,
           child: Container(
             width: double.infinity,
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(13),
               border: Border.all(
@@ -275,16 +370,16 @@ class _NoteListViewState extends State<NoteListView> {
               shadowColor: Colors.black,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
-                side: BorderSide(color: Colors.black, width: 1),
+                side: const BorderSide(color: Colors.black, width: 1),
               ),
             ),
-            icon: Text(
+            icon: const Text(
               '탭해서 삭제',
               style: TextStyle(fontSize: 13, color: Colors.black),
             )
           ),
         ),
-        SizedBox(
+        const SizedBox(
           width: 10,
         ),
         IconButton(
@@ -300,7 +395,7 @@ class _NoteListViewState extends State<NoteListView> {
             shadowColor: Colors.black,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
-              side: BorderSide(color: Colors.black, width: 1),
+              side: const BorderSide(color: Colors.black, width: 1),
             ),
           ),
           icon: const Row(
@@ -368,7 +463,7 @@ class _MemoItem extends State<MemoItem> {
           child: Stack(
             children: [
               Padding(
-                padding: EdgeInsets.all(15),
+                padding: const EdgeInsets.all(15),
                 child: Column(
                   children: [
                     Row(
