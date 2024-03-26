@@ -1,6 +1,7 @@
 // 앱 내 주요 기능관련 클래스.
 import 'dart:io';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:scribble/utils/string.dart';
@@ -42,5 +43,11 @@ class SystemUtil {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     return prefs.getString(SystemData.path) ?? "";
+  }
+
+  // '2024-03-21 13:22'와 같은 형식으로 출력
+  static String getDate(DateTime time) {
+    String formattedDate = DateFormat('yyyy-MM-dd HH:mm').format(time);
+    return formattedDate;
   }
 }

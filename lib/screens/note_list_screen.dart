@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:keyboard_service/keyboard_service.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:scribble/models/Memo.dart';
 import 'package:scribble/providers/data_provider.dart';
 import 'package:scribble/service/routing_service.dart';
 import 'package:provider/provider.dart';
+import 'package:scribble/utils/system_util.dart';
 
 /// 메인 씬
 class NoteListView extends StatefulWidget {
@@ -15,7 +19,7 @@ class NoteListView extends StatefulWidget {
 
 class _NoteListViewState extends State<NoteListView> {
   bool isDeleteMode = false;
-  List<Memo>? currentMemoList;
+  List<Memo> currentMemoList = [];
 
   @override
   void initState() {
@@ -23,6 +27,7 @@ class _NoteListViewState extends State<NoteListView> {
     debugPrint('>>> NoteListView: initState');
 
     currentMemoList = context.read<DataClass>().memoList;
+    readMemoFiles();
   }
 
   @override
@@ -49,6 +54,7 @@ class _NoteListViewState extends State<NoteListView> {
     for (Memo item in dataList) {
       resultList.add(
           MemoItem(
+            item: item,
             action: () {
 
             },
@@ -65,6 +71,54 @@ class _NoteListViewState extends State<NoteListView> {
     }
 
     return resultList;
+  }
+
+  Future<void> readMemoFiles() async {
+    currentMemoList.clear();
+
+    // 앱의 디렉토리 경로 가져오기
+    Directory appDirectory = await getApplicationDocumentsDirectory();
+    String appPath = appDirectory.path;
+
+    // 메모 파일이 있는 경로
+    String memoFolderPath = '$appPath/ScribbleMemo';
+
+    // 디렉토리 열기
+    Directory memoDirectory = Directory(memoFolderPath);
+
+    // 디렉토리 내 파일들 읽기
+    List<FileSystemEntity> files = memoDirectory.listSync();
+
+    // 각 파일에 대해
+    for (FileSystemEntity file in files) {
+      Memo item = Memo();
+
+      // 파일 읽기
+      String fileContent = await File(file.path).readAsString();
+      // 파일 내용을 줄 단위로 나누기
+      List<String> lines = fileContent.split('\n');
+
+      for (String line in lines) {
+        if (line.startsWith('# 제목:')) {
+          item.setTitle(line.substring(6).trim());
+        } else if (line.startsWith('# 작성일:')) {
+          String dateString = line.substring(7).trim();
+          item.setDate(DateTime.parse(dateString));
+        }
+      }
+
+      // 메모 내용 추출 (제목과 작성일은 제외)
+      String content = lines.skipWhile((line) => line.startsWith('#')).join('\n').trim();
+      item.setContent(content);
+
+      // 위젯 리스트에 추가
+      currentMemoList.add(item);
+    }
+
+    Provider.of<DataClass>(context, listen: false).memoList = currentMemoList;
+
+    setState(() {
+    });
   }
 
   @override
@@ -209,7 +263,9 @@ class _NoteListViewState extends State<NoteListView> {
               margin: const EdgeInsets.only(top: 10),
               child: SingleChildScrollView(
                 child: Column(
-                  children: setMemoList(dataList),
+                  children: setMemoList(
+                    context.watch<DataClass>().memoList
+                  ),
                 ),
               ),
             ),
@@ -423,13 +479,14 @@ class _NoteListViewState extends State<NoteListView> {
 // 메모 아이템
 class MemoItem extends StatefulWidget {
   // final User user;
+  final Memo item;
   final VoidCallback action;
   final VoidCallback longAction;
   final bool isSelectMode;
 
   const MemoItem(
       {Key? key,
-        required this.action, required this.longAction, required this.isSelectMode})
+        required this.action, required this.longAction, required this.isSelectMode, required this.item})
       : super(key: key);
 
   @override
@@ -469,12 +526,12 @@ class _MemoItem extends State<MemoItem> {
                     Row(
                       children: [
                         Flexible(
-                            flex: 6,
+                            flex: 4,
                             child: Container(
                                 width: double.infinity,
-                                child: const Text(
-                                  '이 메모는 테스트 입니다.',
-                                  style: TextStyle(
+                                child: Text(
+                                  widget.item.getTitle(),
+                                  style: const TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.bold,
                                       overflow: TextOverflow.ellipsis
@@ -486,34 +543,34 @@ class _MemoItem extends State<MemoItem> {
                             flex: 4,
                             child: Container(
                               width: double.infinity,
-                              child: const Row(
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  Icon(
+                                  const Icon(
                                     Icons.calendar_month_outlined,
                                     size: 15,
                                     color: Colors.black,
                                   ),
-                                  SizedBox(width: 5),
+                                  const SizedBox(width: 5),
                                   Text(
-                                    '2024.03.21',
-                                    style: TextStyle(
+                                    SystemUtil.getDate(widget.item.getDate()),
+                                    style: const TextStyle(
                                         fontSize: 10,
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold,
                                         overflow: TextOverflow.ellipsis
                                     ),
                                   ),
-                                  SizedBox(width: 10),
-                                  Icon(
+                                  const SizedBox(width: 10),
+                                  const Icon(
                                     Icons.text_fields_outlined,
                                     size: 15,
                                     color: Colors.black,
                                   ),
-                                  SizedBox(width: 5),
+                                  const SizedBox(width: 5),
                                   Text(
-                                    '210',
-                                    style: TextStyle(
+                                    widget.item.getRemoveHtmlTags().length.toString(),
+                                    style: const TextStyle(
                                         fontSize: 10,
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold,
@@ -526,18 +583,22 @@ class _MemoItem extends State<MemoItem> {
                         )
                       ],
                     ),
-                    const Padding(
-                      padding: EdgeInsets.only(
+                    Padding(
+                      padding: const EdgeInsets.only(
                           left: 10, right: 10, top: 10
                       ),
-                      child: Text(
-                        '아무렇게나 끄적거리는 메모는 정말 좋은 습관이다. 또한 이 앱은 오프라인으로, 기기 내에 저장되므로 좋다. 정말 좋은 습관이므로 모두 실천하자.',
-                        maxLines: 3,
-                        style: TextStyle(
-                            color: Colors.grey,
-                            overflow: TextOverflow.ellipsis
+                      child: Container(
+                        width: double.infinity,
+                        child: Text(
+                          widget.item.getRemoveHtmlTags(),
+                          maxLines: 3,
+                          textAlign: TextAlign.left,
+                          style: const TextStyle(
+                              color: Colors.grey,
+                              overflow: TextOverflow.ellipsis
+                          ),
                         ),
-                      ),
+                      )
                     ),
                   ],
                 ),

@@ -22,6 +22,7 @@ class NoteEditView extends StatefulWidget {
 class _NoteListViewState extends State<NoteEditView> {
   bool isDeleteMode = false;
 
+  late TextEditingController titleController = TextEditingController();
   late QuillEditorController controller;
   final _toolbarColor = Colors.grey.shade200;
   final _backgroundColor = Colors.white70;
@@ -94,12 +95,13 @@ class _NoteListViewState extends State<NoteEditView> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const TextField(
-                            style: TextStyle( // 입력 내용의 스타일 설정
+                          child: TextField(
+                            controller: titleController,
+                            style: const TextStyle( // 입력 내용의 스타일 설정
                               fontSize: 12, // 폰트 크기
                               color: Colors.black, // 폰트 색상
                             ),
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               filled: true,
                               fillColor: Colors.white,
                               hintText: '제목',
@@ -281,11 +283,27 @@ class _NoteListViewState extends State<NoteEditView> {
 
   Future<void> _saveData() async {
     String path = await SystemUtil.getDataPath();
-    File file = File(path + "/temp222.md");
 
     // final file = await _getLocalFile();
     String htmlText = await getHtmlText();
+
+    DateTime currentDate = DateTime.now();
+    String formattedDate = currentDate.toIso8601String();
+    String title = titleController.text;
+
+    if (title.isEmpty) {
+      title = SystemUtil.getDate(currentDate);
+    }
+
+    htmlText = '# 제목: ${title}\n'
+        '# 작성일: $formattedDate\n\n'
+        '${htmlText}';
+
+
+    // 제목이 같으면 덮어쓰기 되므로 조심...
+    File file = File(path + "/${title}.md");
     await file.writeAsString(htmlText);
+
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Document saved')));
   }
 
