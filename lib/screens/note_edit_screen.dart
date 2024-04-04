@@ -284,6 +284,30 @@ class _NoteListViewState extends State<NoteEditView> {
     return File('${directory.path}/document.txt');
   }
 
+  /// 같은 제목의 메모가 있는지 검증.
+  Future<String> getAvailableMemoFileName(String desiredFileName) async {
+    // 메모 파일이 있는 경로
+    Directory appDirectory = await getApplicationDocumentsDirectory();
+    String appPath = appDirectory.path;
+    String memoFolderPath = '$appPath/ScribbleMemo';
+
+    // 디렉토리 열기
+    Directory memoDirectory = Directory(memoFolderPath);
+
+    // 디렉토리 내 파일들 읽기
+    List<FileSystemEntity> files = memoDirectory.listSync();
+
+    // 동일한 제목을 가진 메모 파일들 검사
+    int count = 1;
+    String newFileName = desiredFileName;
+    while (files.any((file) => file.path.endsWith('/$newFileName.md'))) {
+      newFileName = '$desiredFileName ($count)';
+      count++;
+    }
+
+    return newFileName;
+  }
+
   Future<void> _saveData() async {
     String path = await SystemUtil.getDataPath();
 
@@ -296,6 +320,9 @@ class _NoteListViewState extends State<NoteEditView> {
 
     if (title.isEmpty) {
       title = SystemUtil.getDate(currentDate);
+    } else {
+      // 같은 제목이 폴더 안에 있으면 (N)의 제목을 붙인다.
+      title = await getAvailableMemoFileName(title);
     }
 
     htmlText = '# 제목: ${title}\n'
