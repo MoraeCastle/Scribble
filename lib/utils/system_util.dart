@@ -45,7 +45,8 @@ class SystemUtil {
     return prefs.getString(SystemData.path) ?? "";
   }
 
-  // '2024-03-21 13:22'와 같은 형식으로 출력
+  /// 날짜 형식변환.
+  /// '2024-03-21 13:22'와 같은 형식으로 출력
   static String getDate(DateTime time) {
     String formattedDate = DateFormat('yyyy-MM-dd HH:mm').format(time);
     return formattedDate;

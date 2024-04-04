@@ -37,19 +37,10 @@ class _NoteListViewState extends State<NoteListView> {
     debugPrint('>>> NoteListView: dispose');
   }
 
-  /// 리스트 최신화.
-  refreshMemoList() {
-    debugPrint('>>> NoteListView: refreshMemoList...');
-
-    if (mounted) {
-      setState(() {
-        currentMemoList = context.read<DataClass>().memoList;
-      });
-    }
-  }
-
   List<Widget> setMemoList(List<Memo> dataList) {
     List<Widget> resultList = [];
+
+    debugPrint('갯수는...' + dataList.length.toString());
 
     for (Memo item in dataList) {
       resultList.add(
@@ -149,7 +140,8 @@ class _NoteListViewState extends State<NoteListView> {
                             IconButton(
                               onPressed: () {
                                 Navigator.pushNamed(context, NoteEditRoute).then((value) {
-                                  refreshMemoList();
+                                  // 메모 수정 -> 홈으로 돌아왔을 때...
+                                  readMemoFiles();
                                 });
                               },
                               style: IconButton.styleFrom(
@@ -224,10 +216,9 @@ class _NoteListViewState extends State<NoteListView> {
                         ),
                         child: Stack(
                           children: [
-                            context.watch<DataClass>().memoList.isNotEmpty ?
                             noteList(
                               context.watch<DataClass>().memoList
-                            ) : emptyList(),
+                            ),
                             Positioned.fill(
                               child: Visibility(
                                 visible: currentMemoList != context.watch<DataClass>().memoList,
@@ -254,6 +245,10 @@ class _NoteListViewState extends State<NoteListView> {
   }
 
   Widget noteList(List<Memo> dataList) {
+    if (context.watch<DataClass>().memoList.isEmpty) {
+      return emptyList();
+    }
+
     return Positioned.fill(
       child: Column(
         children: [
@@ -263,9 +258,7 @@ class _NoteListViewState extends State<NoteListView> {
               margin: const EdgeInsets.only(top: 10),
               child: SingleChildScrollView(
                 child: Column(
-                  children: setMemoList(
-                    context.watch<DataClass>().memoList
-                  ),
+                  children: setMemoList(dataList),
                 ),
               ),
             ),
@@ -274,7 +267,7 @@ class _NoteListViewState extends State<NoteListView> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '$dataList.length 개의 메모 조회됨',
+                '${dataList.length} 개의 메모 조회됨',
                 style: const TextStyle(
                     fontSize: 13,
                     color: Colors.grey

@@ -213,9 +213,12 @@ class _NoteListViewState extends State<NoteEditView> {
                                 },
                                 onFocusChanged: (focus) {
                                   debugPrint('has focus $focus');
-                                  setState(() {
-                                    _hasFocus = focus;
-                                  });
+
+                                  if (mounted) {
+                                    setState(() {
+                                      _hasFocus = focus;
+                                    });
+                                  }
                                 },
                                 onTextChanged: (text) => debugPrint('widget text change $text'),
                                 onEditorCreated: () {
@@ -305,6 +308,9 @@ class _NoteListViewState extends State<NoteEditView> {
     await file.writeAsString(htmlText);
 
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Document saved')));
+
+    // 홈으로 돌아가기.
+    Navigator.pop(context);
   }
 
   Future<String?> _readData() async {
