@@ -97,9 +97,9 @@ class _NoteListViewState extends State<NoteEditView> {
                           ),
                           child: TextField(
                             controller: titleController,
-                            style: const TextStyle( // 입력 내용의 스타일 설정
-                              fontSize: 12, // 폰트 크기
-                              color: Colors.black, // 폰트 색상
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.black,
                             ),
                             decoration: const InputDecoration(
                               filled: true,
@@ -328,7 +328,6 @@ class _NoteListViewState extends State<NoteEditView> {
     htmlText = '# 제목: ${title}\n'
         '# 작성일: $formattedDate\n\n'
         '${htmlText}';
-
 
     // 제목이 같으면 덮어쓰기 되므로 조심...
     File file = File(path + "/${title}.md");

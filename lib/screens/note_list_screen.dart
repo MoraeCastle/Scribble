@@ -48,6 +48,7 @@ class _NoteListViewState extends State<NoteListView> {
             item: item,
             action: () {
 
+              Navigator.pushNamed(context, NoteViewRoute, arguments: item.title);
             },
             longAction: () {
               if (!isDeleteMode) {
@@ -64,6 +65,7 @@ class _NoteListViewState extends State<NoteListView> {
     return resultList;
   }
 
+  /// 메모 파일 읽기...
   Future<void> readMemoFiles() async {
     currentMemoList.clear();
 
@@ -502,11 +504,11 @@ class _MemoItem extends State<MemoItem> {
       ),
       elevation: 4.0, //그림자 깊이
       child: InkWell(
-        onTap: () {
+        onTap: widget.isSelectMode ? () {
           setState(() {
             isChecked = !isChecked;
           });
-        },
+        } : widget.action,
         onLongPress: widget.isSelectMode ? null : widget.longAction,
         child: Container(
           height: 130,
