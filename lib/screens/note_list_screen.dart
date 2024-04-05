@@ -7,6 +7,7 @@ import 'package:scribble/models/Memo.dart';
 import 'package:scribble/providers/data_provider.dart';
 import 'package:scribble/service/routing_service.dart';
 import 'package:provider/provider.dart';
+import 'package:scribble/utils/RouteObserver.dart';
 import 'package:scribble/utils/system_util.dart';
 
 /// 메인 씬
@@ -17,7 +18,7 @@ class NoteListView extends StatefulWidget {
   State<NoteListView> createState() => _NoteListViewState();
 }
 
-class _NoteListViewState extends State<NoteListView> {
+class _NoteListViewState extends State<NoteListView> implements RouteAware {
   bool isDeleteMode = false;
   List<Memo> currentMemoList = [];
 
@@ -28,13 +29,38 @@ class _NoteListViewState extends State<NoteListView> {
 
     currentMemoList = context.read<DataClass>().memoList;
     readMemoFiles();
+
+    routeObserver.subscribe(this);
   }
 
   @override
   void dispose() {
-    super.dispose();
-
     debugPrint('>>> NoteListView: dispose');
+
+    routeObserver.unsubscribe(this);
+
+    super.dispose();
+  }
+
+
+  @override
+  void didPop() {
+    debugPrint('didPop..........');
+
+    // 화면으로 다시 돌아온 경우.
+    readMemoFiles();
+  }
+  @override
+  void didPopNext() {
+    debugPrint('didPopNext..........');
+  }
+  @override
+  void didPush() {
+    debugPrint('didPush..........');
+  }
+  @override
+  void didPushNext() {
+    debugPrint('didPushNext..........');
   }
 
   List<Widget> setMemoList(List<Memo> dataList) {
@@ -47,7 +73,6 @@ class _NoteListViewState extends State<NoteListView> {
           MemoItem(
             item: item,
             action: () {
-
               Navigator.pushNamed(context, NoteViewRoute, arguments: item.title);
             },
             longAction: () {

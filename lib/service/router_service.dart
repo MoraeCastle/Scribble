@@ -13,7 +13,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case NoteListRoute:
       return MaterialPageRoute(builder: (context) => NoteListView());
     case NoteEditRoute:
-      return MaterialPageRoute(builder: (context) => NoteEditView());
+      // 넘어가는 메모 제목...
+      String? argument = settings.arguments as String?;
+
+      return MaterialPageRoute(builder: (context) => NoteEditView(arguments: argument ?? ''));
     case NoteViewRoute:
       // 넘어가는 메모 제목...
       String? argument = settings.arguments as String?;

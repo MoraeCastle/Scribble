@@ -5,6 +5,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scribble/service/routing_service.dart';
 import 'package:scribble/service/router_service.dart' as router;
+import 'package:scribble/utils/RouteObserver.dart';
 import 'package:scribble/utils/string.dart';
 import 'package:scribble/utils/system_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,8 +27,11 @@ void main() async {
 Future<void> checkDirectory() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
+  // /data/data/com.sandcastle.scribble/app_flutter/ScribbleMemo
   Directory appDocDirectory = await getApplicationDocumentsDirectory();
   Directory newPath = Directory('${appDocDirectory.path}/ScribbleMemo');
+
+  debugPrint(newPath.path);
 
   if (!await newPath.exists()) {
     await newPath.create(recursive: true).then((value) {
@@ -61,6 +65,7 @@ class MyApp extends StatelessWidget {
       ),
       onGenerateRoute: (settings) => router.generateRoute(settings),
       initialRoute: route,
+      navigatorObservers: [routeObserver],
     );
   }
 }

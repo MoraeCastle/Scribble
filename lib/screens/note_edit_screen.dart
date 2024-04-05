@@ -9,11 +9,16 @@ import 'package:flutter/widgets.dart';
 import 'package:keyboard_service/keyboard_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:quill_html_editor/quill_html_editor.dart';
+import 'package:scribble/models/Memo.dart';
+import 'package:scribble/screens/note_list_screen.dart';
+import 'package:scribble/service/routing_service.dart';
 import 'package:scribble/utils/system_util.dart';
 
 /// 메인 씬
 class NoteEditView extends StatefulWidget {
-  const NoteEditView({super.key});
+  const NoteEditView({Key? key, required this.arguments}) : super(key: key);
+
+  final String arguments;
 
   @override
   State<NoteEditView> createState() => _NoteListViewState();
@@ -35,6 +40,7 @@ class _NoteListViewState extends State<NoteEditView> {
   final _hintTextStyle = const TextStyle(
       fontSize: 18, color: Colors.black38, fontWeight: FontWeight.normal);
   bool _hasFocus = false;
+  Memo item = Memo();
 
   @override
   void initState() {
@@ -52,6 +58,56 @@ class _NoteListViewState extends State<NoteEditView> {
   void dispose() {
     controller.dispose();
     super.dispose();
+  }
+
+  /// 메모 파일 읽기...
+  Future<void> readMemoFiles() async {
+    // 앱의 디렉토리 경로 가져오기
+    Directory appDirectory = await getApplicationDocumentsDirectory();
+    String appPath = appDirectory.path;
+
+    // 메모 파일이 있는 경로
+    String memoFolderPath = '$appPath/ScribbleMemo';
+
+    // 디렉토리 열기
+    Directory memoDirectory = Directory(memoFolderPath);
+
+    // 디렉토리 내 파일들 읽기
+    List<FileSystemEntity> files = memoDirectory.listSync();
+
+    // 각 파일에 대해
+    for (FileSystemEntity file in files) {
+      // 파일 읽기
+      String fileContent = await File(file.path).readAsString();
+      // 파일 내용을 줄 단위로 나누기
+      List<String> lines = fileContent.split('\n');
+
+      for (String line in lines) {
+        if (line.startsWith('# 제목:')) {
+          if (line.substring(6).trim() == widget.arguments) {
+            item.setTitle(line.substring(6).trim());
+          }
+        } else if (line.startsWith('# 작성일:')) {
+          String dateString = line.substring(7).trim();
+          item.setDate(DateTime.parse(dateString));
+        }
+      }
+
+      if (item.getTitle().isNotEmpty) {
+        String content = lines.skipWhile((line) => line.startsWith('#')).join('\n').trim();
+        item.setContent(content);
+
+        break;
+      }
+    }
+
+    debugPrint('dfsdfsdfsdfdsf');
+
+    titleController.text = item.getTitle();
+    controller.setText(item.getContent());
+
+    setState(() {
+    });
   }
 
   @override
@@ -223,6 +279,11 @@ class _NoteListViewState extends State<NoteEditView> {
                                 onTextChanged: (text) => debugPrint('widget text change $text'),
                                 onEditorCreated: () {
                                   debugPrint('Editor has been loaded');
+
+                                  // 메모 수정모드일 경우...
+                                  if (widget.arguments.isNotEmpty) {
+                                    readMemoFiles();
+                                  }
                                   // setHtmlText('Testing text on load');
                                 },
                                 onEditorResized: (height) =>
@@ -308,7 +369,60 @@ class _NoteListViewState extends State<NoteEditView> {
     return newFileName;
   }
 
+  /// 메모 수정.
+  Future<void> editMemo(String fileName, String newTitle, String newContent) async {
+    // 메모 파일이 있는 경로
+    Directory appDirectory = await getApplicationDocumentsDirectory();
+    String appPath = appDirectory.path;
+    String memoFolderPath = '$appPath/ScribbleMemo';
+    String oldFilePath = '$memoFolderPath/$fileName.md';
+
+    // 새로운 파일 이름 생성
+    String newFileName = '$newTitle.md';
+    String newFilePath = '$memoFolderPath/$newFileName';
+
+    // 파일 읽기
+    File memoFile = File(oldFilePath);
+    String fileContent = await memoFile.readAsString();
+
+    DateTime currentDate = DateTime.now();
+    String formattedDate = currentDate.toIso8601String();
+
+    // 제목과 내용 수정
+    String updatedContent = fileContent.replaceAllMapped(
+        RegExp(r'^# 제목: .+$', multiLine: true), (match) => '# 제목: $newTitle');
+    updatedContent = updatedContent.replaceAllMapped(
+        RegExp(r'^# 작성일: .+$', multiLine: true), (match) => '# 작성일: $formattedDate');
+    updatedContent = updatedContent.replaceAllMapped(
+        RegExp(r'(?<=^# 작성일: .+\n\n).+?(?=\n*$)', multiLine: true), (match) => newContent);
+
+    // 제목도 수정인지, 내용만 수정인지 구분.
+    if (fileName != newTitle) {
+      // 수정된 내용을 새 파일에 저장
+      File newMemoFile = File(newFilePath);
+      await newMemoFile.writeAsString(updatedContent);
+
+      // 기존 파일 삭제
+      await memoFile.delete();
+    } else {
+      // 내용만 수정일 경우.
+      await memoFile.writeAsString(updatedContent);
+    }
+  }
+
+  /// 메모 저장.
   Future<void> _saveData() async {
+    // 수정모드라면 해당 메모 수정.
+    if (widget.arguments.isNotEmpty) {
+      String htmlText = await getHtmlText();
+      await editMemo(widget.arguments, titleController.text, htmlText);
+
+      // 홈으로 돌아가기.
+      Navigator.pop(context);
+      //Navigator.pushReplacementNamed(context, NoteListRoute);
+      return;
+    }
+
     String path = await SystemUtil.getDataPath();
 
     // final file = await _getLocalFile();

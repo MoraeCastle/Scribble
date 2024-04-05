@@ -10,6 +10,8 @@ import 'package:keyboard_service/keyboard_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:quill_html_editor/quill_html_editor.dart';
 import 'package:scribble/models/Memo.dart';
+import 'package:scribble/service/routing_service.dart';
+import 'package:scribble/utils/WidgetBuilder.dart';
 import 'package:scribble/utils/system_util.dart';
 
 /// 메모 읽기 씬.
@@ -59,20 +61,28 @@ class _NoteViewState extends State<NoteView> {
       // 파일 내용을 줄 단위로 나누기
       List<String> lines = fileContent.split('\n');
 
+      debugPrint('>>> ' + widget.arguments);
+
       for (String line in lines) {
         if (line.startsWith('# 제목:')) {
-          item.setTitle(line.substring(6).trim());
+          debugPrint('>>> 11' + line.substring(6).trim());
+          if (line.substring(6).trim() == widget.arguments) {
+            item.setTitle(line.substring(6).trim());
+          }
         } else if (line.startsWith('# 작성일:')) {
           String dateString = line.substring(7).trim();
           item.setDate(DateTime.parse(dateString));
         }
       }
 
-      // 맞는 제목만.
-      if (item.getTitle() != widget.arguments) continue;
+      if (item.getTitle().isNotEmpty) {
+        debugPrint('>>> 22222');
 
-      String content = lines.skipWhile((line) => line.startsWith('#')).join('\n').trim();
-      item.setContent(content);
+        String content = lines.skipWhile((line) => line.startsWith('#')).join('\n').trim();
+        item.setContent(content);
+
+        break;
+      }
     }
 
     setState(() {
@@ -205,6 +215,19 @@ class _NoteViewState extends State<NoteView> {
     );
   }
 
-  void _writeNote() {}
+  void _writeNote() {
+    debugPrint('>> ' + item.getTitle());
 
+    CustomDialog.doubleButton(
+        context, Icons.border_color_outlined, '수정하기',
+        '메모를 수정하시겠습니까?', null, '네', () {
+      Navigator.pop(context);
+      Navigator.pop(context);
+
+      Navigator.pushNamed(context, NoteEditRoute, arguments: item.getTitle());
+    }, '아니오', () {
+      Navigator.pop(context);
+    }, true
+    );
+  }
 }
