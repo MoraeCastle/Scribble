@@ -143,47 +143,51 @@ class _SettingViewState extends State<SettingView> {
                             ),
                           ),*/
                           // 메모파일 폴더 이동
-                          Container(
-                            height: 70,
-                            margin: EdgeInsets.only(bottom: 10),
-                            child: IconButton(
-                                onPressed: () {
-                                },
-                                style: IconButton.styleFrom(
-                                  elevation: 5,
-                                  backgroundColor: Colors.white,
-                                  foregroundColor: Colors.grey,
-                                  surfaceTintColor: Colors.white,
-                                  padding: EdgeInsets.all(15),
-                                  shadowColor: Colors.black,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    side: BorderSide(color: Colors.black, width: 1),
-                                  ),
-                                ),
-                                icon: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.folder_copy_outlined,
-                                          size: 25,
-                                          color: Colors.black,
-                                        ),
-                                        SizedBox(width: 10),
-                                        Text(
-                                          '저장된 메모파일로 이동하기',
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold
-                                          ),
-                                        ),
-                                      ],
+                          // 이 기능은 현재 메모파일이 앱 폴더 내에 있으므로 불가한 기능.
+                          Visibility(
+                            visible: false,
+                            child: Container(
+                              height: 70,
+                              margin: EdgeInsets.only(bottom: 10),
+                              child: IconButton(
+                                  onPressed: () {
+                                  },
+                                  style: IconButton.styleFrom(
+                                    elevation: 5,
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: Colors.grey,
+                                    surfaceTintColor: Colors.white,
+                                    padding: EdgeInsets.all(15),
+                                    shadowColor: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      side: BorderSide(color: Colors.black, width: 1),
                                     ),
-                                  ],
-                                )
+                                  ),
+                                  icon: const Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.folder_copy_outlined,
+                                            size: 25,
+                                            color: Colors.black,
+                                          ),
+                                          SizedBox(width: 10),
+                                          Text(
+                                            '저장된 메모파일로 이동하기',
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  )
+                              ),
                             ),
                           ),
                           // 개발자 문의

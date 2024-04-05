@@ -447,7 +447,7 @@ class _NoteListViewState extends State<NoteEditView> {
     File file = File(path + "/${title}.md");
     await file.writeAsString(htmlText);
 
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Document saved')));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('메모가 저장되었습니다.')));
 
     // 홈으로 돌아가기.
     Navigator.pop(context);

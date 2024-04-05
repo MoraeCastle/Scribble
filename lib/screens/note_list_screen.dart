@@ -216,7 +216,7 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
                               onPressed: () {
                                 Navigator.pushNamed(context, NoteEditRoute).then((value) {
                                   // 메모 수정 -> 홈으로 돌아왔을 때...
-                                  readMemoFiles();
+                                  //readMemoFiles();
                                 });
                               },
                               style: IconButton.styleFrom(
