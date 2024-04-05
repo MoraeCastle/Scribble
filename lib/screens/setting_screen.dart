@@ -13,10 +13,10 @@ class SettingView extends StatefulWidget {
   const SettingView({super.key});
 
   @override
-  State<SettingView> createState() => _NoteListViewState();
+  State<SettingView> createState() => _SettingViewState();
 }
 
-class _NoteListViewState extends State<SettingView> {
+class _SettingViewState extends State<SettingView> {
   bool isDeleteMode = false;
   String emailAddress = 'gotogetherqna@gmail.com';
 

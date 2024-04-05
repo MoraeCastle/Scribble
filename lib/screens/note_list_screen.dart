@@ -22,6 +22,8 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
   bool isDeleteMode = false;
   List<Memo> currentMemoList = [];
 
+  List<String> selectMemos = [];
+
   @override
   void initState() {
     super.initState();
@@ -74,6 +76,14 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
             item: item,
             action: () {
               Navigator.pushNamed(context, NoteViewRoute, arguments: item.title);
+            },
+            deleteAction: () {
+              // 중복데이터 방지.
+              if (!selectMemos.contains(item.title)) {
+                selectMemos.add(item.title);
+              } else {
+                selectMemos.remove(item.title);
+              }
             },
             longAction: () {
               if (!isDeleteMode) {
@@ -137,6 +147,44 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
 
     setState(() {
     });
+  }
+
+  /// 메모 삭제.
+  Future<void> deleteMemo(String fileName) async {
+    try {
+      // 메모 파일이 있는 경로
+      Directory appDirectory = await getApplicationDocumentsDirectory();
+      String appPath = appDirectory.path;
+      String memoFolderPath = '$appPath/ScribbleMemo';
+      String filePath = '$memoFolderPath/$fileName.md';
+
+      // 파일 삭제
+      File memoFile = File(filePath);
+      await memoFile.delete();
+
+      debugPrint('$fileName 이 삭제되었습니다.');
+    } catch (e) {
+      debugPrint('삭제증 오류가 발생했습니다.... : $e');
+    }
+  }
+
+  // 선택한 메모 파일들 삭제.
+  Future<void> deleteMemos(List<String> targetMemos) async {
+    for (String target in targetMemos) {
+      await deleteMemo(target);
+    }
+
+    setState(() {
+      selectMemos.clear();
+
+      isDeleteMode = false;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${targetMemos.length} 개의 메모가 삭제되었습니다.'))
+    );
+
+    readMemoFiles();
   }
 
   @override
@@ -435,9 +483,8 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
         Expanded(
           child: IconButton(
             onPressed: () {
-              /*setState(() {
-                isDeleteMode = false;
-              });*/
+              // 선택한 메모들 삭제...
+              deleteMemos(selectMemos);
             },
             style: IconButton.styleFrom(
               backgroundColor: Colors.red.withAlpha(50),
@@ -501,12 +548,13 @@ class MemoItem extends StatefulWidget {
   // final User user;
   final Memo item;
   final VoidCallback action;
+  final VoidCallback deleteAction;
   final VoidCallback longAction;
   final bool isSelectMode;
 
   const MemoItem(
       {Key? key,
-        required this.action, required this.longAction, required this.isSelectMode, required this.item})
+        required this.action, required this.longAction, required this.isSelectMode, required this.item, required this.deleteAction})
       : super(key: key);
 
   @override
@@ -530,6 +578,9 @@ class _MemoItem extends State<MemoItem> {
       elevation: 4.0, //그림자 깊이
       child: InkWell(
         onTap: widget.isSelectMode ? () {
+          // 다른 줄과 사용 중일 때에는 () 사용 주의 !!!
+          widget.deleteAction();
+
           setState(() {
             isChecked = !isChecked;
           });
