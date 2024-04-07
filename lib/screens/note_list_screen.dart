@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_service/keyboard_service.dart';
 import 'package:path_provider/path_provider.dart';
@@ -7,7 +9,8 @@ import 'package:scribble/models/Memo.dart';
 import 'package:scribble/providers/data_provider.dart';
 import 'package:scribble/service/routing_service.dart';
 import 'package:provider/provider.dart';
-import 'package:scribble/utils/RouteObserver.dart';
+import 'package:scribble/utils/routeObserver.dart';
+import 'package:scribble/utils/string.dart';
 import 'package:scribble/utils/system_util.dart';
 
 /// 메인 씬
@@ -21,15 +24,23 @@ class NoteListView extends StatefulWidget {
 class _NoteListViewState extends State<NoteListView> implements RouteAware {
   bool isDeleteMode = false;
   List<Memo> currentMemoList = [];
+  /// TODO: 남은 기능
+  /// 정렬 및 검색 기능....
+  List<Memo> searchMemoList = [];
 
   List<String> selectMemos = [];
+
+  // 기본값은 최근 데이터...
+  String sortType = SystemData.koSortType[1];
 
   @override
   void initState() {
     super.initState();
     debugPrint('>>> NoteListView: initState');
 
-    currentMemoList = context.read<DataClass>().memoList;
+   /* currentMemoList = context.read<DataClass>().memoList;
+    searchMemoList.addAll(currentMemoList);*/
+
     readMemoFiles();
 
     routeObserver.subscribe(this);
@@ -65,12 +76,41 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
     debugPrint('didPushNext..........');
   }
 
+  /// 메모 데이터 정렬.
+  List<Memo> sortMemos(List<Memo> memoList, String sortType) {
+    // 리스트 복제.
+    List<Memo> sortedList = List.from(memoList);
+
+    // 아직은 한국어만....
+    switch (sortType) {
+      case '가나다순':
+        sortedList.sort((a, b) => a.title.compareTo(b.title));
+        break;
+      case '최근':
+        sortedList.sort((a, b) => b.date.compareTo(a.date));
+        break;
+      case '처음':
+        sortedList.sort((a, b) => a.date.compareTo(b.date));
+        break;
+      case '내용':
+        sortedList.sort((a, b) => b.content.length.compareTo(a.content.length));
+        break;
+    }
+
+    return sortedList;
+  }
+
+  /// 메모 데이터를 위젯으로 변환....
+  /// 내부에 검색 조건있음.
   List<Widget> setMemoList(List<Memo> dataList) {
     List<Widget> resultList = [];
 
     debugPrint('갯수는...' + dataList.length.toString());
 
-    for (Memo item in dataList) {
+    searchMemoList.clear();
+    searchMemoList.addAll(sortMemos(dataList, sortType));
+
+    for (Memo item in searchMemoList) {
       resultList.add(
           MemoItem(
             item: item,
@@ -319,6 +359,7 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
     );
   }
 
+  /// 메모 리스트
   Widget noteList(List<Memo> dataList) {
     if (context.watch<DataClass>().memoList.isEmpty) {
       return emptyList();
@@ -391,8 +432,93 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
     return Row(
       children: [
         Flexible(
-          flex: 3,
-          child: IconButton(
+          flex: 4,
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton2<String>(
+              isExpanded: true,
+              hint: const Row(
+                children: [
+                  Icon(
+                    Icons.sort_outlined,
+                    color: Colors.black,
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Expanded(
+                    child: Text(
+                      '정렬',
+                      style: TextStyle(fontSize: 13, color: Colors.black),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              items: SystemData.koSortType
+                  .map((String type) => DropdownMenuItem<String>(
+                value: type,
+                child: Text(
+                  type,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ))
+                  .toList(),
+              value: sortType,
+              onChanged: (value) {
+                setState(() {
+                  sortType = value ?? '최근';
+                });
+              },
+              buttonStyleData: ButtonStyleData(
+                padding: const EdgeInsets.only(left: 5, right: 5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(13),
+                  border: Border.all(
+                    color: Colors.black,
+                    width: 1
+                  ),
+                  color: Colors.white,
+                ),
+                // elevation: 2,
+              ),
+              iconStyleData: const IconStyleData(
+                icon: Icon(
+                  Icons.arrow_drop_down,
+                  size: 20,
+                ),
+                iconSize: 14,
+                iconEnabledColor: Colors.black,
+                iconDisabledColor: Colors.grey,
+              ),
+              dropdownStyleData: DropdownStyleData(
+                // maxHeight: 200,
+                // width: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                      color: Colors.black,
+                      width: 1
+                  ),
+                  color: Colors.white,
+                ),
+                // offset: const Offset(-20, 0),
+                scrollbarTheme: ScrollbarThemeData(
+                  radius: const Radius.circular(40),
+                  thickness: MaterialStateProperty.all(6),
+                  thumbVisibility: MaterialStateProperty.all(true),
+                ),
+              ),
+              menuItemStyleData: const MenuItemStyleData(
+                height: 40,
+              ),
+            ),
+          ),
+          /*child: IconButton(
             onPressed: () {
 
             },
@@ -422,7 +548,7 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
                 )
               ],
             ),
-          ),
+          ),*/
         ),
         const SizedBox(
           width: 10,

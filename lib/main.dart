@@ -5,7 +5,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scribble/service/routing_service.dart';
 import 'package:scribble/service/router_service.dart' as router;
-import 'package:scribble/utils/RouteObserver.dart';
+import 'package:scribble/utils/routeObserver.dart';
 import 'package:scribble/utils/string.dart';
 import 'package:scribble/utils/system_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';

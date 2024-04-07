@@ -11,7 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:quill_html_editor/quill_html_editor.dart';
 import 'package:scribble/models/Memo.dart';
 import 'package:scribble/service/routing_service.dart';
-import 'package:scribble/utils/WidgetBuilder.dart';
+import 'package:scribble/utils/widgetBuilder.dart';
 import 'package:scribble/utils/system_util.dart';
 
 /// 메모 읽기 씬.
