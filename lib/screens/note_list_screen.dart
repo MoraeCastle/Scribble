@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:keyboard_service/keyboard_service.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scribble/models/Memo.dart';
@@ -29,6 +31,7 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
   List<Memo> searchMemoList = [];
 
   List<String> selectMemos = [];
+  TextEditingController searchController = TextEditingController();
 
   // 기본값은 최근 데이터...
   String sortType = SystemData.koSortType[1];
@@ -184,6 +187,9 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
     }
 
     Provider.of<DataClass>(context, listen: false).memoList = currentMemoList;
+    Provider.of<DataClass>(context, listen: false).searchMemoList = getSearchMemoList(
+      searchController.text
+    );
 
     setState(() {
     });
@@ -332,11 +338,12 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
                         child: Stack(
                           children: [
                             noteList(
-                              context.watch<DataClass>().memoList
+                              context.watch<DataClass>().searchMemoList
                             ),
+                            /// 로딩창
                             Positioned.fill(
                               child: Visibility(
-                                visible: currentMemoList != context.watch<DataClass>().memoList,
+                                visible: currentMemoList.isEmpty,
                                 child: Container(
                                   color: Colors.white,
                                   child: const Center(
@@ -361,6 +368,7 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
 
   /// 메모 리스트
   Widget noteList(List<Memo> dataList) {
+    // 메모 데이터가 아무것도 없을 때.
     if (context.watch<DataClass>().memoList.isEmpty) {
       return emptyList();
     }
@@ -557,6 +565,7 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
           flex: 9,
           child: Container(
             width: double.infinity,
+            height: 40,
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(13),
@@ -565,27 +574,51 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
                 width: 1,
               ),
             ),
-            child: const Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Flexible(
                   flex: 1,
-                  child: Icon(
-                    Icons.search,
-                    size: 15,
-                    color: Colors.black,
-                  ),
+                  child: IconButton(
+                    onPressed: () {
+                      Provider.of<DataClass>(context, listen: false).searchMemoList =
+                          getSearchMemoList(searchController.text);
+                    },
+                    padding: EdgeInsets.zero,
+                    icon: const Icon(
+                      Icons.search,
+                      size: 15,
+                      color: Colors.black,
+                    ),
+                  )
                 ),
                 Flexible(
                   flex: 8,
                   child: TextField(
+                    controller: searchController,
+                    onChanged: (value) {
+                      if (value.isEmpty) {
+                        Provider.of<DataClass>(context, listen: false).searchMemoList =
+                            getSearchMemoList(value);
+                      }
+                      /// 메모 데이터 다시 정렬....
+                      /*Provider.of<DataClass>(context, listen: false).searchMemoList =
+                          getSearchMemoList(value);*/
+                    },
+                    /*onSubmitted: (value) {
+                      debugPrint('onSubmitted.......................');
+                    },*/
+                    onEditingComplete: () {
+                      Provider.of<DataClass>(context, listen: false).searchMemoList =
+                          getSearchMemoList(searchController.text);
+                    },
                     style: TextStyle( // 입력 내용의 스타일 설정
                       fontSize: 11, // 폰트 크기
                       color: Colors.black, // 폰트 색상
                     ),
                     decoration: InputDecoration(
                       border: InputBorder.none, // 테두리 없애기
-                      hintText: '검색어 입력...',
+                      hintText: '입력 후 검색 버튼을 누르세요...',
                       hintStyle: TextStyle(
                         fontSize: 10,
                       ),
@@ -602,6 +635,25 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
       ],
     );
   }
+
+  /// 검색어에 따라 새로운 메모 데이터 리스트를 반환합니다.
+  List<Memo> getSearchMemoList(String temp) {
+    List<Memo> answer = [];
+    List<Memo> searchList = [];
+    searchList.addAll(context.read<DataClass>().memoList);
+
+    // 타이틀이나 내용 중에 검색어가 들어가면 추가.
+    for (Memo item in searchList) {
+      if (item.title.contains(temp) || item.getRemoveHtmlTags().contains(temp)) {
+        answer.add(item);
+      }
+    }
+
+    debugPrint('${answer.length} 개의 데이터 변환');
+    
+    return answer;
+  }
+
 
   Widget deleteBar() {
     return Row(
