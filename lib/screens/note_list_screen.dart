@@ -343,7 +343,8 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
                             /// 로딩창
                             Positioned.fill(
                               child: Visibility(
-                                visible: currentMemoList.isEmpty,
+                                visible: !mounted,
+                                // visible: context.watch<DataClass>().memoList.isEmpty,
                                 child: Container(
                                   color: Colors.white,
                                   child: const Center(
