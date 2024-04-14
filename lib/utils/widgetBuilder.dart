@@ -140,7 +140,13 @@ class CustomDialog {
             ),
             title: Container(
               alignment: Alignment.center,
-              child: Text(title),
+              child: Text(
+                title,
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold
+                ),
+              ),
             ),
             content: Wrap(
               children: [
