@@ -182,6 +182,7 @@ class _NoteViewState extends State<NoteView> {
                     ),
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: Colors.black,
@@ -193,17 +194,22 @@ class _NoteViewState extends State<NoteView> {
                       alignment: Alignment.topLeft,
                       margin: const EdgeInsets.only(top: 10),
                       child: item.getContent().isNotEmpty ? SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Text(
-                              '${item.getRemoveHtmlTags()}',
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 13,
-                                // overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
+                        child: QuillHtmlEditor(
+                          minHeight: 10,
+                          text: item.getContent(),
+                          controller: QuillEditorController(),
+                          backgroundColor: Colors.transparent,
+                          isEnabled: false,
+                          autoFocus: false,
+                          hintTextAlign: TextAlign.start,
+                          padding: const EdgeInsets.only(left: 10, top: 10),
+                          loadingBuilder: (context) {
+                            return const Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 1,
+                                  color: Colors.black,
+                                ));
+                          },
                         ),
                       ) : null,
                     ),

@@ -221,6 +221,7 @@ class _NoteListViewState extends State<NoteEditView> {
                       ),
                       child: Container(
                         margin: EdgeInsets.only(top: 10),
+                        color: Colors.white,
                         child: Column(
                           children: [
                             Container(
@@ -235,7 +236,7 @@ class _NoteListViewState extends State<NoteEditView> {
                                 ),
                               ),
                               child: ToolBar.scroll(
-                                toolBarColor: Colors.transparent,
+                                toolBarColor: Colors.white,
                                 activeIconColor: Colors.black,
                                 padding: const EdgeInsets.all(8),
                                 iconSize: 20,
@@ -250,21 +251,21 @@ class _NoteListViewState extends State<NoteEditView> {
                                 controller: controller,
                                 isEnabled: true,
                                 ensureVisible: false,
-                                minHeight: 500,
+                                minHeight: 10,
                                 autoFocus: false,
                                 textStyle: _editorTextStyle,
                                 hintTextStyle: _hintTextStyle,
                                 hintTextAlign: TextAlign.start,
                                 padding: const EdgeInsets.only(left: 10, top: 10),
                                 hintTextPadding: const EdgeInsets.only(left: 20),
-                                backgroundColor: _backgroundColor,
+                                backgroundColor: Colors.transparent,
                                 inputAction: InputAction.newline,
                                 onEditingComplete: (s) => debugPrint('Editing completed $s'),
                                 loadingBuilder: (context) {
                                   return const Center(
                                       child: CircularProgressIndicator(
                                         strokeWidth: 1,
-                                        color: Colors.red,
+                                        color: Colors.black,
                                       ));
                                 },
                                 onFocusChanged: (focus) {
