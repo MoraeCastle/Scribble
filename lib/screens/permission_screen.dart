@@ -50,7 +50,7 @@ class _PermissionViewState extends State<PermissionView> {
     await SystemUtil.checkDirectory();
 
     // 씬 이동.
-    Navigator.pushNamed(context, HomeViewRoute);
+    Navigator.pushReplacementNamed(context, HomeViewRoute);
   }
 
   @override
