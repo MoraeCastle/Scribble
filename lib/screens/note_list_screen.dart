@@ -157,6 +157,10 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
     // 디렉토리 열기
     Directory memoDirectory = Directory(memoFolderPath);
 
+    if (await memoDirectory.exists() == false) {
+      await memoDirectory.create(recursive: true);
+    }
+
     // 디렉토리 내 파일들 읽기
     List<FileSystemEntity> files = memoDirectory.listSync();
 
