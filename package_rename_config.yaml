@@ -8,16 +8,16 @@ package_rename_config:
   ios:
     app_name: 끄적끄적
     bundle_name: 끄적끄적
-    package_name: com.sandcastle.travel
+    package_name: com.sandcastle.scribble
 
   linux:
     app_name: 끄적끄적
-    package_name: com.sandcastle.travel
+    package_name: com.sandcastle.scribble
     exe_name:
 
   macos:
     app_name: 끄적끄적
-    package_name: com.sandcastle.travel
+    package_name: com.sandcastle.scribble
     copyright_notice:
 
   web:
