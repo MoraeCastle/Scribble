@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/cupertino.dart';
@@ -624,7 +625,7 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
                     ),
                     decoration: InputDecoration(
                       border: InputBorder.none, // 테두리 없애기
-                      hintText: '입력 후 검색 버튼을 누르세요...',
+                      hintText: '메모 검색',
                       hintStyle: TextStyle(
                         fontSize: 10,
                       ),
@@ -785,7 +786,7 @@ class _MemoItem extends State<MemoItem> {
                       children: [
                         const Icon(
                           Icons.calendar_month_outlined,
-                          size: 11,
+                          size: 12,
                           color: Colors.black,
                         ),
                         const SizedBox(width: 5),
@@ -793,13 +794,13 @@ class _MemoItem extends State<MemoItem> {
                           SystemUtil.getDate(widget.item.getDate()),
                           style: const TextStyle(
                             fontSize: 10,
-                            color: Colors.black,
+                            fontWeight: FontWeight.w500
                           ),
                         ),
                         const SizedBox(width: 10),
                         const Icon(
                           Icons.text_fields_outlined,
-                          size: 11,
+                          size: 12,
                           color: Colors.black,
                         ),
                         const SizedBox(width: 5),
@@ -807,7 +808,7 @@ class _MemoItem extends State<MemoItem> {
                           widget.item.getRemoveHtmlTags().length.toString(),
                           style: const TextStyle(
                             fontSize: 10,
-                            color: Colors.black,
+                            fontWeight: FontWeight.w500
                           ),
                         ),
                       ]

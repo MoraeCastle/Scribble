@@ -12,11 +12,15 @@ class SystemUtil {
   /// 권한 상태 확인.
   /// 하나라도 허용되어 있다면 허용 처리됨.
   static Future<bool> getPermissionGranted() async {
-    bool storagePermission = await Permission.storage.isGranted;
-    bool mediaPermission = await Permission.accessMediaLocation.isGranted;
-    bool manageExternal = await Permission.manageExternalStorage.isGranted;
-
-    return storagePermission || mediaPermission || manageExternal;
+    if (Platform.isAndroid) {
+      bool storagePermission = await Permission.storage.isGranted;
+      bool mediaPermission = await Permission.accessMediaLocation.isGranted;
+      bool manageExternal = await Permission.manageExternalStorage.isGranted;
+      return storagePermission || mediaPermission || manageExternal;
+    } else if (Platform.isIOS) {
+      return true;
+    }
+    return false;
   }
 
   static Future<bool> isPermanentlyDenied() async {
@@ -29,30 +33,15 @@ class SystemUtil {
 
   /// 저장소 권한 요청.
   static Future<bool> requestPermission() async {
-    bool storagePermission = await Permission.storage.isGranted;
-    bool mediaPermission = await Permission.accessMediaLocation.isGranted;
-    bool manageExternal = await Permission.manageExternalStorage.isGranted;
-
-    if (!storagePermission) {
-      storagePermission = await Permission.storage.request().isGranted;
-    }
-
-    if (!mediaPermission) {
-      mediaPermission = await Permission.accessMediaLocation.request().isGranted;
-    }
-
-    if (!manageExternal) {
-      manageExternal = await Permission.manageExternalStorage.request().isGranted;
-    }
-
-    bool isPermissionGranted =
-        storagePermission || mediaPermission || manageExternal;
-
-    if (isPermissionGranted) {
+    if (Platform.isAndroid) {
+      bool storagePermission = await Permission.storage.request().isGranted;
+      bool mediaPermission = await Permission.accessMediaLocation.request().isGranted;
+      bool manageExternal = await Permission.manageExternalStorage.request().isGranted;
+      return storagePermission || mediaPermission || manageExternal;
+    } else if (Platform.isIOS) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   /// 메모 폴더가 없다면 폴더 생성.
