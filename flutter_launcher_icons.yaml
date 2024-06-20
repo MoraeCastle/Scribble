@@ -9,7 +9,7 @@ flutter_launcher_icons:
   adaptive_icon_foreground: "assets/images/app_image_plus.png"
 
   # for IOS...
-  image_path_ios: "assets/images/app_icon.png"
+  image_path_ios: "assets/images/app_image.png"
 #  adaptive_icon_foreground: "assets/images/app_icon_square.png"
 #
 #  android: "launcher_icon"
