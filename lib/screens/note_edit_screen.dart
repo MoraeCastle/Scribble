@@ -390,12 +390,16 @@ class _NoteListViewState extends State<NoteEditView> {
     String formattedDate = currentDate.toIso8601String();
 
     // 제목과 내용 수정
-    String updatedContent = fileContent.replaceAllMapped(
+    /*String updatedContent = fileContent.replaceAllMapped(
         RegExp(r'^# 제목: .+$', multiLine: true), (match) => '# 제목: $newTitle');
     updatedContent = updatedContent.replaceAllMapped(
         RegExp(r'^# 작성일: .+$', multiLine: true), (match) => '# 작성일: $formattedDate');
     updatedContent = updatedContent.replaceAllMapped(
-        RegExp(r'(?<=^# 작성일: .+\n\n).+?(?=\n*$)', multiLine: true), (match) => newContent);
+        RegExp(r'(?<=^# 작성일: .+\n\n).+?(?=\n*$)', multiLine: true), (match) => newContent);*/
+    String updatedContent = fileContent
+        .replaceFirst(RegExp(r'^# 제목: .+$', multiLine: true), '# 제목: $newTitle')
+        .replaceFirst(RegExp(r'^# 작성일: .+$', multiLine: true), '# 작성일: $formattedDate')
+        .replaceFirst(RegExp(r'(?<=^# 작성일: .+\n\n).+', multiLine: true), newContent);
 
     // 제목도 수정인지, 내용만 수정인지 구분.
     if (fileName != newTitle) {
@@ -424,7 +428,15 @@ class _NoteListViewState extends State<NoteEditView> {
       return;
     }
 
-    String path = await SystemUtil.getDataPath();
+    // String path = await SystemUtil.getDataPath();
+    // 도큐먼트 디렉토리 경로를 가져옵니다.
+    Directory appDocDirectory = await getApplicationDocumentsDirectory();
+    Directory newPath = Directory('${appDocDirectory.path}/ScribbleMemo');
+
+    // ScribbleMemo 디렉토리가 존재하지 않으면 생성합니다.
+    if (!await newPath.exists()) {
+      await newPath.create(recursive: true);
+    }
 
     // final file = await _getLocalFile();
     String htmlText = await getHtmlText();
@@ -445,7 +457,7 @@ class _NoteListViewState extends State<NoteEditView> {
         '${htmlText}';
 
     // 제목이 같으면 덮어쓰기 되므로 조심...
-    File file = File(path + "/${title}.md");
+    File file = File('${newPath.path}/$title.md');
     await file.writeAsString(htmlText);
 
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('메모가 저장되었습니다.')));
