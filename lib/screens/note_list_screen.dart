@@ -270,7 +270,7 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
                                 });
                               },
                               style: IconButton.styleFrom(
-                                elevation: 5,
+                                elevation: 3,
                                 backgroundColor: Colors.white,
                                 foregroundColor: Colors.grey,
                                 surfaceTintColor: Colors.white,
@@ -303,7 +303,7 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
                                   Navigator.pushNamed(context, SettingRoute);
                                 },
                                 style: IconButton.styleFrom(
-                                  elevation: 5,
+                                  elevation: 3,
                                   backgroundColor: Colors.white,
                                   foregroundColor: Colors.grey,
                                   surfaceTintColor: Colors.white,
@@ -573,6 +573,7 @@ class _NoteListViewState extends State<NoteListView> implements RouteAware {
             height: 40,
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
+              color: Colors.white,
               borderRadius: BorderRadius.circular(13),
               border: Border.all(
                 color: Colors.black,
@@ -758,7 +759,7 @@ class _MemoItem extends State<MemoItem> {
             width: 1
         ),
       ),
-      elevation: 4.0, //그림자 깊이
+      elevation: 3.0, //그림자 깊이
       child: InkWell(
         onTap: widget.isSelectMode ? () {
           // 다른 줄과 사용 중일 때에는 () 사용 주의 !!!
@@ -770,7 +771,9 @@ class _MemoItem extends State<MemoItem> {
         } : widget.action,
         onLongPress: widget.isSelectMode ? null : widget.longAction,
         child: Container(
-          height: 130,
+          constraints: const BoxConstraints(
+            maxHeight: 150,
+          ),
           child: Stack(
             children: [
               Padding(
@@ -778,57 +781,49 @@ class _MemoItem extends State<MemoItem> {
                 child: Column(
                   children: [
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Flexible(
-                          flex: 6,
-                          child: Row(
-                            children: [
-                              Text(
-                                widget.item.getTitle(),
-                                style: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    overflow: TextOverflow.ellipsis
-                                ),
-                              )
-                            ],
+                        const Icon(
+                          Icons.calendar_month_outlined,
+                          size: 11,
+                          color: Colors.black,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          SystemUtil.getDate(widget.item.getDate()),
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: Colors.black,
                           ),
                         ),
-                        Flexible(
-                          flex: 4,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              const Icon(
-                                Icons.calendar_month_outlined,
-                                size: 11,
-                                color: Colors.black,
-                              ),
-                              const SizedBox(width: 5),
-                              Text(
-                                SystemUtil.getDate(widget.item.getDate()),
-                                style: const TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.black,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              const Icon(
-                                Icons.text_fields_outlined,
-                                size: 11,
-                                color: Colors.black,
-                              ),
-                              const SizedBox(width: 5),
-                              Text(
-                                widget.item.getRemoveHtmlTags().length.toString(),
-                                style: const TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.black,
-                                ),
-                              ),
-                            ],
+                        const SizedBox(width: 10),
+                        const Icon(
+                          Icons.text_fields_outlined,
+                          size: 11,
+                          color: Colors.black,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          widget.item.getRemoveHtmlTags().length.toString(),
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: Colors.black,
                           ),
                         ),
+                      ]
+                    ),
+                    const SizedBox(height: 5),
+                    Row(
+                      children: [
+                        Text(
+                          widget.item.getTitle(),
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            overflow: TextOverflow.ellipsis,
+                            fontSize: 15
+                          ),
+                        )
                       ],
                     ),
                     Padding(

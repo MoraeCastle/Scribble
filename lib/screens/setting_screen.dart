@@ -50,7 +50,7 @@ class _SettingViewState extends State<SettingView> {
                               Navigator.pop(context);
                             },
                             style: IconButton.styleFrom(
-                              elevation: 5,
+                              elevation: 3,
                               backgroundColor: Colors.white,
                               foregroundColor: Colors.grey,
                               surfaceTintColor: Colors.white,
@@ -153,7 +153,7 @@ class _SettingViewState extends State<SettingView> {
                                   onPressed: () {
                                   },
                                   style: IconButton.styleFrom(
-                                    elevation: 5,
+                                    elevation: 3,
                                     backgroundColor: Colors.white,
                                     foregroundColor: Colors.grey,
                                     surfaceTintColor: Colors.white,
@@ -196,7 +196,7 @@ class _SettingViewState extends State<SettingView> {
                             child: IconButton(
                                 onPressed: () => contactUs(),
                                 style: IconButton.styleFrom(
-                                  elevation: 5,
+                                  elevation: 3,
                                   backgroundColor: Colors.white,
                                   foregroundColor: Colors.grey,
                                   surfaceTintColor: Colors.white,

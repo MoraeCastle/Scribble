@@ -109,7 +109,7 @@ class _PermissionViewState extends State<PermissionView> {
                               width: 1,
                           ),
                         ),
-                        elevation: 5,
+                        elevation: 3,
                         child: Padding(
                           padding: const EdgeInsets.all(25),
                           child: Column(
@@ -172,7 +172,7 @@ class _PermissionViewState extends State<PermissionView> {
                   style: OutlinedButton.styleFrom(
                     // backgroundColor: Color.fromARGB(255, 159, 195, 255),
                     backgroundColor: Colors.white,
-                    elevation: 10,
+                    elevation: 3,
                     side: const BorderSide(
                         color: Colors.black,
                         width: 1

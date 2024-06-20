@@ -108,7 +108,7 @@ class _NoteViewState extends State<NoteView> {
                         Navigator.pop(context);
                       },
                       style: IconButton.styleFrom(
-                        elevation: 5,
+                        elevation: 3,
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.grey,
                         surfaceTintColor: Colors.white,
@@ -126,7 +126,7 @@ class _NoteViewState extends State<NoteView> {
                     SizedBox(width: 5),
                     Expanded(
                       child: Material(
-                        elevation: 5,
+                        elevation: 3,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -155,7 +155,7 @@ class _NoteViewState extends State<NoteView> {
                     IconButton(
                       onPressed: () => _writeNote(),
                       style: IconButton.styleFrom(
-                        elevation: 5,
+                        elevation: 3,
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.grey,
                         surfaceTintColor: Colors.white,
