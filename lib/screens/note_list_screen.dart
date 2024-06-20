@@ -780,62 +780,63 @@ class _MemoItem extends State<MemoItem> {
                     Row(
                       children: [
                         Flexible(
-                            flex: 4,
-                            child: Container(
-                                width: double.infinity,
-                                child: Text(
-                                  widget.item.getTitle(),
-                                  style: const TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                      overflow: TextOverflow.ellipsis
-                                  ),
-                                )
-                            )
+                          flex: 6,
+                          child: Row(
+                            children: [
+                              Text(
+                                widget.item.getTitle(),
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    overflow: TextOverflow.ellipsis
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                         Flexible(
-                            flex: 4,
-                            child: Container(
-                              width: double.infinity,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  const Icon(
-                                    Icons.calendar_month_outlined,
-                                    size: 15,
-                                    color: Colors.black,
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    SystemUtil.getDate(widget.item.getDate()),
-                                    style: const TextStyle(
-                                        fontSize: 10,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                        overflow: TextOverflow.ellipsis
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  const Icon(
-                                    Icons.text_fields_outlined,
-                                    size: 15,
-                                    color: Colors.black,
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    widget.item.getRemoveHtmlTags().length.toString(),
-                                    style: const TextStyle(
-                                        fontSize: 10,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                        overflow: TextOverflow.ellipsis
-                                    ),
-                                  ),
-                                ],
+                          flex: 4,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              const Icon(
+                                Icons.calendar_month_outlined,
+                                size: 11,
+                                color: Colors.black,
                               ),
-                            )
-                        )
+                              const SizedBox(width: 5),
+                              Text(
+                                SystemUtil.getDate(widget.item.getDate()),
+                                style: const TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.black,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              const Icon(
+                                Icons.text_fields_outlined,
+                                size: 11,
+                                color: Colors.black,
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                widget.item.getRemoveHtmlTags().length.toString(),
+                                style: const TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 5),
+                      child: Divider(
+                        height: 1,
+                        color: Colors.grey.withAlpha(50),
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(
